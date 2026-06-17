@@ -25,7 +25,7 @@ class MainViewModel : ViewModel() {
         retrieveData()
     }
 
-    private fun retrieveData() {
+    fun retrieveData() {
         viewModelScope.launch(Dispatchers.IO) {
             status.value = ApiStatus.LOADING
 

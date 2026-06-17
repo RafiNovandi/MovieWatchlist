@@ -3,8 +3,10 @@ package com.muhammadrafinovandi0108.moviewatchlist.ui.screen
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,8 +14,10 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -29,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -71,10 +76,12 @@ fun ScreenContent(modifier: Modifier = Modifier) {
 
     when (status) {
         ApiStatus.LOADING -> {
-            Text(
-                text = "Loading...",
-                modifier = modifier.padding(16.dp)
-            )
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
         }
 
         ApiStatus.SUCCESS -> {
@@ -88,8 +95,20 @@ fun ScreenContent(modifier: Modifier = Modifier) {
         }
 
         ApiStatus.FAILED -> {
-            Text(text = stringResource(id = R.string.error),
-            )
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = stringResource(id = R.string.error))
+                Button(
+                    onClick = { viewModel.retrieveData() },
+                    modifier = Modifier.padding(top = 16.dp),
+                    contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
+                ) {
+                    Text(text = stringResource(id = R.string.try_again))
+                }
+            }
         }
     }
 }
@@ -112,7 +131,9 @@ fun ListItem(movie: Movie) {
                     .build(),
                 contentDescription = movie.title,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxWidth().padding(4.dp).clip(RoundedCornerShape(10.dp))
+                placeholder = painterResource(id = R.drawable.loading_img),
+                error = painterResource(id = R.drawable.broken_image),
+                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp))
             )
             Column(
                 modifier = Modifier
