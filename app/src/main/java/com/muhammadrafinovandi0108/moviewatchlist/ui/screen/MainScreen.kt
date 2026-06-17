@@ -41,16 +41,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.muhammadrafinovandi0108.moviewatchlist.R
 import com.muhammadrafinovandi0108.moviewatchlist.model.Movie
+import com.muhammadrafinovandi0108.moviewatchlist.navigation.Screen
 import com.muhammadrafinovandi0108.moviewatchlist.network.ApiStatus
 import com.muhammadrafinovandi0108.moviewatchlist.ui.theme.MovieWatchlistTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -64,12 +66,14 @@ fun MainScreen() {
             )
         }
     ) { innerPadding ->
-        ScreenContent(Modifier.padding(innerPadding))
+        ScreenContent(
+            navController = navController,
+            modifier = Modifier.padding(innerPadding))
     }
 }
 
 @Composable
-fun ScreenContent(modifier: Modifier = Modifier) {
+fun ScreenContent(navController: NavHostController, modifier: Modifier = Modifier) {
     val viewModel: MainViewModel = viewModel()
     val data by viewModel.data
     val status by viewModel.status.collectAsState()
@@ -90,7 +94,14 @@ fun ScreenContent(modifier: Modifier = Modifier) {
                 columns = GridCells.Fixed(2),
 
             ) {
-                items(data) { ListItem(movie = it) }
+                items(data) { movie ->
+                    ListItem(
+                        movie = movie,
+                        onClick = {
+                            navController.navigate(Screen.Detail.createRoute(movie.id))
+                        }
+                    )
+                }
             }
         }
 
@@ -114,8 +125,9 @@ fun ScreenContent(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ListItem(movie: Movie) {
+fun ListItem(movie: Movie, onClick: () -> Unit) {
     Card(
+        onClick = onClick,
         modifier = Modifier.padding(8.dp),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)

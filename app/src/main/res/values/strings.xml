@@ -2,4 +2,6 @@
     <string name="app_name">Movie Watchlist</string>
     <string name="error">Gagal memuat data.. Koneksi error.</string>
     <string name="try_again">Coba lagi</string>
+    <string name="kembali">Kembali</string>
+    <string name="detail_film">Detail Film</string>
 </resources>

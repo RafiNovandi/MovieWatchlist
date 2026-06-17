@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.muhammadrafinovandi0108.moviewatchlist.ui.screen.MainScreen
+import com.muhammadrafinovandi0108.moviewatchlist.navigation.SetupNavGraph
 import com.muhammadrafinovandi0108.moviewatchlist.ui.theme.MovieWatchlistTheme
 
 class MainActivity : ComponentActivity() {
@@ -13,7 +13,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MovieWatchlistTheme() {
-                MainScreen()
+                SetupNavGraph()
             }
         }
     }
