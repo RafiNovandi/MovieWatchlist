@@ -21,3 +21,5 @@ object MovieApi {
         retrofit.create(MovieApiService::class.java)
     }
 }
+
+enum class ApiStatus { LOADING, SUCCESS, FAILED }

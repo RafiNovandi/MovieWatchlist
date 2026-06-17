@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Movie Watchlist</string>
+    <string name="error">Gagal memuat data.. Koneksi error.</string>
 </resources>
