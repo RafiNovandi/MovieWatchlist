@@ -1,4 +1,4 @@
-package com.muhammadrafinovandi0108.moviewatchlist
+package com.muhammadrafinovandi0108.moviewatchlist.ui.screen
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.padding
@@ -12,8 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.muhammadrafinovandi0108.moviewatchlist.R
 import com.muhammadrafinovandi0108.moviewatchlist.ui.theme.MovieWatchlistTheme
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,7 +47,7 @@ fun ScreenContent(modifier: Modifier = Modifier) {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
 fun MainScreenPreview() {
-    MovieWatchlistTheme {
-        com.muhammadrafinovandi0108.moviewatchlist.ui.screen.MainScreen()
+    MovieWatchlistTheme() {
+        MainScreen()
     }
 }
