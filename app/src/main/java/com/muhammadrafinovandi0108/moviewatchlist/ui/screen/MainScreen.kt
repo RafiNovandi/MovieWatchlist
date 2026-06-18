@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +30,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,18 +61,24 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingExcept
 import com.muhammadrafinovandi0108.moviewatchlist.BuildConfig
 import com.muhammadrafinovandi0108.moviewatchlist.R
 import com.muhammadrafinovandi0108.moviewatchlist.model.Movie
+import com.muhammadrafinovandi0108.moviewatchlist.model.User
 import com.muhammadrafinovandi0108.moviewatchlist.navigation.Screen
 import com.muhammadrafinovandi0108.moviewatchlist.network.ApiStatus
+import com.muhammadrafinovandi0108.moviewatchlist.network.UserDataStore
 import com.muhammadrafinovandi0108.moviewatchlist.ui.theme.MovieWatchlistTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.Dispatcher
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavHostController) {
     val context = LocalContext.current
+    val dataStore = UserDataStore(context)
+    val user by dataStore.userFlow.collectAsState(User())
+
+    var showDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -83,7 +91,12 @@ fun MainScreen(navController: NavHostController) {
                 ),
                 actions = {
                     IconButton(onClick = {
-                        CoroutineScope(Dispatchers.IO).launch { signIn(context) }
+                        if (user.email.isEmpty()) {
+                            CoroutineScope(Dispatchers.IO).launch { signIn(context, dataStore) }
+                        }
+                        else {
+                            showDialog = true
+                        }
                     }) {
                         Icon(
                             painter = painterResource(R.drawable.account_circle_24),
@@ -98,6 +111,14 @@ fun MainScreen(navController: NavHostController) {
         ScreenContent(
             navController = navController,
             modifier = Modifier.padding(innerPadding))
+
+        if (showDialog) {
+            ProfilDialog(
+                user = user,
+                onDismissRequest = { showDialog = false }) {
+                showDialog = false
+            }
+        }
     }
 }
 
@@ -179,7 +200,6 @@ fun ListItem(movie: Movie, onClick: () -> Unit) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(4.dp)
                     .clip(RoundedCornerShape(10.dp))
                     .background(
                         Color(
@@ -210,7 +230,7 @@ fun ListItem(movie: Movie, onClick: () -> Unit) {
     }
 }
 
-private suspend fun signIn(context: Context) {
+private suspend fun signIn(context: Context, dataStore: UserDataStore) {
     val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
         .setFilterByAuthorizedAccounts(false)
         .setServerClientId(BuildConfig.API_KEY)
@@ -221,25 +241,32 @@ private suspend fun signIn(context: Context) {
     try {
         val credentialManager = CredentialManager.create(context)
         val result = credentialManager.getCredential(context, request)
-        handleSignIn(result)
+        handleSignIn(result, dataStore)
     } catch (e: GetCredentialException) {
         Log.e("SIGN-IN", "Error: ${e.errorMessage}")
     }
 }
 
-private fun handleSignIn(result: GetCredentialResponse) {
+private suspend fun handleSignIn(
+    result: GetCredentialResponse,
+    dataStore: UserDataStore
+    ) {
     val credential = result.credential
     if (credential is CustomCredential &&
         credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
         try {
             val googleId = GoogleIdTokenCredential.createFrom(credential.data)
-            Log.d("SIGN-IN", "User email: ${googleId.id}")
+            val nama = googleId.displayName ?: ""
+            val email = googleId.id
+            val photoUrl = googleId.profilePictureUri.toString()
+            dataStore.saveData(User(nama, email, photoUrl)
+            )
         } catch (e: GoogleIdTokenParsingException) {
             Log.e("SIGN-IN", "Error: ${e.message}")
         }
     }
     else {
-        Log.e("SIGN-IN", "Error: unrecognized custom credential type")
+        Log.e("SIGN-IN", "Error: unrecognized custom credential type.")
     }
 }
 
