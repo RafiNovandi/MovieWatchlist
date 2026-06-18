@@ -6,7 +6,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
-private const val BASE_URL = BuildConfig.SUPABASE_URL
+private val BASE_URL = BuildConfig.SUPABASE_URL
 
 object MovieApi {
 

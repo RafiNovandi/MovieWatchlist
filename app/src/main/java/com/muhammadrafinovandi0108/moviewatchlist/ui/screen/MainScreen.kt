@@ -8,12 +8,14 @@ import android.graphics.ImageDecoder
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -94,6 +96,9 @@ fun MainScreen(navController: NavHostController) {
     val dataStore = UserDataStore(context)
     val user by dataStore.userFlow.collectAsState(User())
 
+    val viewModel: MainViewModel = viewModel()
+    val errorMessage by viewModel.errorMessage
+
     var showDialog by remember { mutableStateOf(false) }
     var showFilmDialog by remember { mutableStateOf(false) }
 
@@ -165,8 +170,10 @@ fun MainScreen(navController: NavHostController) {
         }
     ) { innerPadding ->
         ScreenContent(
+            viewModel = viewModel,
             navController = navController,
             modifier = Modifier.padding(innerPadding))
+
 
         if (showDialog) {
             ProfilDialog(
@@ -181,16 +188,19 @@ fun MainScreen(navController: NavHostController) {
             FilmDialog(
                 bitmap = bitmap,
                 onDismissRequest = { showFilmDialog = false }) { title, genre, rating, watchDate, review ->
-                Log.d("TAMBAH", "$title $genre $rating $watchDate $review ditambahkan.")
+                viewModel.saveMovie(title, genre, rating.toInt(), watchDate, review, bitmap!!)
                 showFilmDialog = false
             }
+        }
+        if (errorMessage != null) {
+            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+            viewModel.clearMessage()
         }
     }
 }
 
 @Composable
-fun ScreenContent(navController: NavHostController, modifier: Modifier = Modifier) {
-    val viewModel: MainViewModel = viewModel()
+fun ScreenContent(viewModel: MainViewModel, navController: NavHostController, modifier: Modifier = Modifier) {
     val data by viewModel.data
     val status by viewModel.status.collectAsState()
 
@@ -262,7 +272,10 @@ fun ListItem(movie: Movie, onClick: () -> Unit) {
                 contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = R.drawable.loading_img),
                 error = painterResource(id = R.drawable.broken_image),
-                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(2f / 3f)
+                    .clip(RoundedCornerShape(12.dp))
             )
             Column(
                 modifier = Modifier

@@ -35,6 +35,9 @@ android {
         buildConfigField(
             "String", "SUPABASE_KEY", properties.getProperty("SUPABASE_KEY")
         )
+        buildConfigField(
+            "String", "SUPABASE_BASE_URL", properties.getProperty("SUPABASE_BASE_URL")
+        )
 
     }
 

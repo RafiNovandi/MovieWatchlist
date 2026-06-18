@@ -1,7 +1,6 @@
 package com.muhammadrafinovandi0108.moviewatchlist.ui.screen
 
 import android.content.res.Configuration
-import androidx.benchmark.traceprocessor.Row
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,7 +32,6 @@ import coil.request.ImageRequest
 import com.muhammadrafinovandi0108.moviewatchlist.R
 import com.muhammadrafinovandi0108.moviewatchlist.model.User
 import com.muhammadrafinovandi0108.moviewatchlist.ui.theme.MovieWatchlistTheme
-import okhttp3.Request
 
 @Composable
 fun ProfilDialog(
