@@ -88,6 +88,7 @@ import com.muhammadrafinovandi0108.moviewatchlist.model.User
 import com.muhammadrafinovandi0108.moviewatchlist.navigation.Screen
 import com.muhammadrafinovandi0108.moviewatchlist.network.ApiStatus
 import com.muhammadrafinovandi0108.moviewatchlist.network.UserDataStore
+import com.muhammadrafinovandi0108.moviewatchlist.ui.theme.GreyTitle
 import com.muhammadrafinovandi0108.moviewatchlist.ui.theme.MovieWatchlistTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -137,7 +138,7 @@ fun MainScreen(navController: NavHostController) {
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = Color.White
                 ),
                 actions = {
                     IconButton(onClick = {
@@ -163,7 +164,7 @@ fun MainScreen(navController: NavHostController) {
                             Icon(
                                 painter = painterResource(R.drawable.account_circle_24),
                                 contentDescription = stringResource(R.string.profil),
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = Color.White
                             )
                         }
                     }
@@ -402,7 +403,6 @@ fun ListItem(
                     }
                 )
             }
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -411,8 +411,8 @@ fun ListItem(
                     .padding(8.dp)
             ) {
                 Text(movie.title, fontWeight = FontWeight.Bold, color = Color.White)
-                Text(movie.genre, fontStyle = FontStyle.Italic, fontSize = 14.sp, color = Color.White)
-                Text("${movie.rating}/10", color = Color.White)
+                Text(movie.genre, fontStyle = FontStyle.Italic, fontSize = 14.sp, color = GreyTitle)
+                Text("${movie.rating}/10", color = GreyTitle)
             }
         }
     }
@@ -427,8 +427,7 @@ fun EmptyLoginState(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "Silahkan login terlebih dahulu",
-            style = MaterialTheme.typography.titleMedium,
+            text = (stringResource(R.string.silahkan_login)),
             fontWeight = FontWeight.Medium
         )
     }

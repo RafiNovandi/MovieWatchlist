@@ -1,22 +1,35 @@
 package com.muhammadrafinovandi0108.moviewatchlist.ui.screen
 
 import android.content.res.Configuration
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -28,6 +41,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.muhammadrafinovandi0108.moviewatchlist.R
+import com.muhammadrafinovandi0108.moviewatchlist.ui.theme.BgGrey
+import com.muhammadrafinovandi0108.moviewatchlist.ui.theme.GreySubTitle
+import com.muhammadrafinovandi0108.moviewatchlist.ui.theme.GreyTitle
 import com.muhammadrafinovandi0108.moviewatchlist.ui.theme.MovieWatchlistTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,7 +65,7 @@ fun DetailScreen(navController: NavController, movieId: Long) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(id = R.string.kembali),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = Color.White
                         )
                     }
                 },
@@ -58,7 +74,7 @@ fun DetailScreen(navController: NavController, movieId: Long) {
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = Color.White,
                 )
             )
         }
@@ -77,15 +93,19 @@ fun DetailScreen(navController: NavController, movieId: Long) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(360.dp)
+                        .border(width = 1.dp, color = Color.Gray, shape = RoundedCornerShape(16.dp))
                         .clip(RoundedCornerShape(16.dp))
                 )
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                     shape = RoundedCornerShape(16.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = BgGrey
+                    )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(16.dp),
                     ) {
                         Text(
                             text = it.title,
@@ -93,36 +113,54 @@ fun DetailScreen(navController: NavController, movieId: Long) {
                             fontWeight = FontWeight.Bold
                         )
 
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(20.dp))
 
-                        Text(
-                            text = stringResource(id = R.string.genre),
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = it.genre,
-                            fontStyle = FontStyle.Italic
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column {
+                                Text(
+                                    text = stringResource(id = R.string.genre),
+                                    fontWeight = FontWeight.Bold,
+                                    color = GreyTitle
+                                )
+                                Text(
+                                    text = it.genre,
+                                    fontStyle = FontStyle.Italic,
+                                    color = GreySubTitle
 
-                        Text(
-                            text = stringResource(id = R.string.rating),
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(text = "${it.rating}/10")
-
-                        Text(
-                            text = stringResource(id = R.string.watched_date),
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(text = it.watched_date)
+                                )
+                            }
+                            Column(
+                                horizontalAlignment = Alignment.End
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.rating),
+                                    fontWeight = FontWeight.Bold,
+                                    color = GreyTitle
+                                )
+                                Text(text = "${it.rating}/10",color = GreySubTitle)
+                            }
+                        }
 
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = stringResource(id = R.string.review),
-                            fontWeight = FontWeight.Bold
+                            text = stringResource(id = R.string.watched_date),
+                            fontWeight = FontWeight.Bold,
+                            color = GreyTitle
                         )
-                        Text(text = it.review)
+                        Text(text = it.watched_date, color = GreySubTitle)
+
+                        Spacer(modifier = Modifier.height(15.dp))
+
+                        Text(
+                            text = stringResource(id = R.string.review),
+                            fontWeight = FontWeight.Bold,
+                            color = GreyTitle
+                        )
+                        Text(text = it.review, color = GreySubTitle)
                     }
                 }
             }

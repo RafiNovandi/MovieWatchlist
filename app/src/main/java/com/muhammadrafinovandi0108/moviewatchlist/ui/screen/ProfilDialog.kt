@@ -64,7 +64,7 @@ fun ProfilDialog(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(12.dp)
                 )
                 Text(
                     text = user.email,
@@ -101,7 +101,7 @@ fun ProfilDialog(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
 fun DialogPreview() {
-    MovieWatchlistTheme() {
+    MovieWatchlistTheme {
         ProfilDialog(
             user = User("Muhammad Rafi Novandi", "mrafinovandi04@gmail.com", ""),
             onDismissRequest = {},

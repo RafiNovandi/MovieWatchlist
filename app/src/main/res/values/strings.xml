@@ -15,4 +15,5 @@
     <string name="batal">Batal</string>
     <string name="simpan">Simpan</string>
     <string name="judul">Judul</string>
+    <string name="silahkan_login">Silakhan login terlebih dahulu.</string>
 </resources>

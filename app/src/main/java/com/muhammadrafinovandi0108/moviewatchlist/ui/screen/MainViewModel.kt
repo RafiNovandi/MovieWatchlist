@@ -50,7 +50,6 @@ class MainViewModel : ViewModel() {
             }
         }
     }
-
     fun retrieveData(email: String) {
         viewModelScope.launch(Dispatchers.IO) {
             status.value = ApiStatus.LOADING
@@ -67,7 +66,6 @@ class MainViewModel : ViewModel() {
             }
         }
     }
-
     fun saveMovie(
         email: String,
         title: String,
@@ -136,7 +134,6 @@ class MainViewModel : ViewModel() {
     fun clearMessage() {
         errorMessage.value = null
     }
-
     fun deleteMovie(email: String, movieId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -158,7 +155,6 @@ class MainViewModel : ViewModel() {
             }
         }
     }
-
     fun updateMovie(
         email: String,
         movieId: Long,
