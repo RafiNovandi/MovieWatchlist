@@ -1,11 +1,12 @@
 package com.muhammadrafinovandi0108.moviewatchlist.network
 
+import com.muhammadrafinovandi0108.moviewatchlist.BuildConfig
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
-private const val BASE_URL = "https://vqtcniqbquhooxrodrrj.supabase.co/rest/v1/"
+private const val BASE_URL = BuildConfig.SUPABASE_URL
 
 object MovieApi {
 

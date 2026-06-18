@@ -2,6 +2,7 @@ package com.muhammadrafinovandi0108.moviewatchlist.ui.screen
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
@@ -17,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -62,7 +65,6 @@ fun DetailScreen(navController: NavController, movieId: Long) {
                     .padding(16.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-
                 AsyncImage(
                     model = it.image_url,
                     contentDescription = it.title,
@@ -72,14 +74,52 @@ fun DetailScreen(navController: NavController, movieId: Long) {
                         .height(360.dp)
                         .clip(RoundedCornerShape(16.dp))
                 )
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = it.title,
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold
+                        )
 
-                Text(text = it.title)
-                Text(text = "Genre: ${it.genre}")
-                Text(text = "Rating: ${it.rating}/10")
-                Text(text = "Watched: ${it.watched_date}")
+                        Spacer(modifier = Modifier.height(10.dp))
 
-                Text(text = "Review:")
-                Text(text = it.review)
+                        Text(
+                            text = stringResource(id = R.string.genre),
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = it.genre,
+                            fontStyle = FontStyle.Italic
+                        )
+
+                        Text(
+                            text = stringResource(id = R.string.rating),
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(text = "${it.rating}/10")
+
+                        Text(
+                            text = stringResource(id = R.string.watched_date),
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(text = it.watched_date)
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = stringResource(id = R.string.review),
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(text = it.review)
+                    }
+                }
             }
         }
     }

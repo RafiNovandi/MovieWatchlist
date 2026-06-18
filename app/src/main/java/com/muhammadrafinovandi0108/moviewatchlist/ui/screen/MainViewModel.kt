@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.muhammadrafinovandi0108.moviewatchlist.BuildConfig
 import com.muhammadrafinovandi0108.moviewatchlist.model.Movie
 import com.muhammadrafinovandi0108.moviewatchlist.network.ApiStatus
 import com.muhammadrafinovandi0108.moviewatchlist.network.MovieApi
@@ -19,7 +20,7 @@ class MainViewModel : ViewModel() {
 
     var status = MutableStateFlow(ApiStatus.LOADING)
         private set
-    private val apiKey = "sb_publishable_pIo7nYR0WYTNADery0jVBw_R2lqlyb2"
+    private val apiKey = BuildConfig.SUPABASE_KEY
 
     init {
         retrieveData()

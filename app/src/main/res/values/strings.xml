@@ -4,4 +4,9 @@
     <string name="try_again">Coba lagi</string>
     <string name="kembali">Kembali</string>
     <string name="detail_film">Detail Film</string>
+    <string name="genre">Genre</string>
+    <string name="rating">Rating</string>
+    <string name="watched_date">Watched Date</string>
+    <string name="review">Review</string>
+    <string name="profil">Profil</string>
 </resources>
