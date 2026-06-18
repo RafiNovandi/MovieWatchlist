@@ -1,12 +1,8 @@
-package com.muhammadrafinovandi0108.moviewatchlist.network
-
 import com.muhammadrafinovandi0108.moviewatchlist.model.Movie
 import retrofit2.Response
 import retrofit2.http.Body
-import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
-import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Query
 
@@ -21,7 +17,6 @@ data class MovieBody(
 )
 
 interface MovieApiService {
-
     @GET("movies?select=*")
     suspend fun getMovies(
         @Header("apikey") apiKey: String,
@@ -29,34 +24,11 @@ interface MovieApiService {
         @Query("user_id") userId: String
     ): List<Movie>
 
-    @GET("movies?select=*")
-    suspend fun getMovieById(
-        @Header("apikey") apiKey: String,
-        @Header("Authorization") authorization: String,
-        @Query("id") id: String
-    ): List<Movie>
-
     @POST("movies")
     suspend fun postMovie(
         @Header("apikey") apiKey: String,
         @Header("Authorization") authorization: String,
         @Header("Prefer") prefer: String = "return=representation",
-        @Body movie: MovieBody
-    ): Response<List<Movie>>
-
-    @DELETE("movies")
-    suspend fun deleteMovie(
-        @Header("apikey") apiKey: String,
-        @Header("Authorization") authorization: String,
-        @Query("id") id: String
-    ): Response<Unit>
-
-    @PATCH("movies")
-    suspend fun updateMovie(
-        @Header("apikey") apiKey: String,
-        @Header("Authorization") authorization: String,
-        @Header("Prefer") prefer: String = "return=representation",
-        @Query("id") id: String,
         @Body movie: MovieBody
     ): Response<List<Movie>>
 }

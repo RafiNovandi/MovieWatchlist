@@ -27,10 +27,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -41,6 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -99,13 +103,30 @@ fun MainScreen(navController: NavHostController) {
     val viewModel: MainViewModel = viewModel()
     val errorMessage by viewModel.errorMessage
 
+    var selectedMovie by remember { mutableStateOf<Movie?>(null) }
+    var showEditDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(user.email) {
+        if (user.email.isNotEmpty()) {
+            viewModel.retrieveData(user.email)
+        } else {
+            viewModel.clearData()
+        }
+    }
+
     var showDialog by remember { mutableStateOf(false) }
     var showFilmDialog by remember { mutableStateOf(false) }
 
     var bitmap: Bitmap? by remember { mutableStateOf(null) }
     val launcher = rememberLauncherForActivityResult(CropImageContract()) {
-        bitmap = getCroppedImage(context.contentResolver, it)
-        if (bitmap != null) showFilmDialog =true
+        val croppedBitmap = getCroppedImage(context.contentResolver, it)
+
+        if (croppedBitmap != null) {
+            bitmap = croppedBitmap
+            selectedMovie = null
+            showEditDialog = false
+            showFilmDialog = true
+        }
     }
 
     Scaffold(
@@ -150,29 +171,40 @@ fun MainScreen(navController: NavHostController) {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                val options = CropImageContractOptions(
-                    null, CropImageOptions(
-                        imageSourceIncludeGallery = true,
-                        imageSourceIncludeCamera = true,
-                        fixAspectRatio = true,
-                        aspectRatioX = 2,
-                        aspectRatioY = 3
+            if (user.email.isNotEmpty()) {
+                FloatingActionButton(onClick = {
+                    val options = CropImageContractOptions(
+                        null, CropImageOptions(
+                            imageSourceIncludeGallery = true,
+                            imageSourceIncludeCamera = true,
+                            fixAspectRatio = true,
+                            aspectRatioX = 2,
+                            aspectRatioY = 3
+                        )
                     )
-                )
-                launcher.launch(options)
-            }) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(id = R.string.tambah_film)
-                )
+                    launcher.launch(options)
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(id = R.string.tambah_film)
+                    )
+                }
             }
         }
     ) { innerPadding ->
         ScreenContent(
             viewModel = viewModel,
             navController = navController,
-            modifier = Modifier.padding(innerPadding))
+            email = user.email,
+            modifier = Modifier.padding(innerPadding),
+            onEditClick = { movie ->
+                selectedMovie = movie
+                showEditDialog = true
+            },
+            onDeleteClick = { movie ->
+                viewModel.deleteMovie(user.email, movie.id)
+            }
+        )
 
 
         if (showDialog) {
@@ -184,30 +216,82 @@ fun MainScreen(navController: NavHostController) {
             }
         }
 
-        if (showFilmDialog) {
+        if (showEditDialog && selectedMovie != null) {
             FilmDialog(
-                bitmap = bitmap,
-                onDismissRequest = { showFilmDialog = false }) { title, genre, rating, watchDate, review ->
-                viewModel.saveMovie(title, genre, rating.toInt(), watchDate, review, bitmap!!)
-                showFilmDialog = false
+                bitmap = null,
+                movie = selectedMovie,
+                onDismissRequest = {
+                    showEditDialog = false
+                    selectedMovie = null
+                }
+            ) { title, genre, rating, watchDate, review ->
+                viewModel.updateMovie(
+                    email = user.email,
+                    movieId = selectedMovie!!.id,
+                    title = title,
+                    genre = genre,
+                    rating = rating.toInt(),
+                    watchedDate = watchDate,
+                    review = review,
+                    imageUrl = selectedMovie!!.image_url
+                )
+
+                showEditDialog = false
+                selectedMovie = null
             }
         }
         if (errorMessage != null) {
             Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
             viewModel.clearMessage()
         }
+
+        if (showFilmDialog) {
+            FilmDialog(
+                bitmap = bitmap,
+                movie = null,
+                onDismissRequest = {
+                    showFilmDialog = false
+                    bitmap = null
+                }
+            ) { title, genre, rating, watchDate, review ->
+                viewModel.saveMovie(
+                    user.email,
+                    title,
+                    genre,
+                    rating.toInt(),
+                    watchDate,
+                    review,
+                    bitmap!!
+                )
+
+                showFilmDialog = false
+                bitmap = null
+            }
+        }
     }
 }
 
 @Composable
-fun ScreenContent(viewModel: MainViewModel, navController: NavHostController, modifier: Modifier = Modifier) {
+fun ScreenContent(
+    viewModel: MainViewModel,
+    navController: NavHostController,
+    email: String,
+    modifier: Modifier = Modifier,
+    onEditClick: (Movie) -> Unit,
+    onDeleteClick: (Movie) -> Unit
+){
     val data by viewModel.data
     val status by viewModel.status.collectAsState()
+
+    if (email.isEmpty()) {
+        EmptyLoginState(modifier = modifier)
+        return
+    }
 
     when (status) {
         ApiStatus.LOADING -> {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
@@ -216,17 +300,20 @@ fun ScreenContent(viewModel: MainViewModel, navController: NavHostController, mo
 
         ApiStatus.SUCCESS -> {
             LazyVerticalGrid(
-                modifier = modifier.fillMaxSize().padding(4.dp),
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(4.dp),
                 columns = GridCells.Fixed(2),
                 contentPadding = PaddingValues(bottom = 80.dp)
-
             ) {
                 items(data) { movie ->
                     ListItem(
                         movie = movie,
                         onClick = {
                             navController.navigate(Screen.Detail.createRoute(movie.id))
-                        }
+                        },
+                        onEditClick = onEditClick,
+                        onDeleteClick = onDeleteClick
                     )
                 }
             }
@@ -234,13 +321,13 @@ fun ScreenContent(viewModel: MainViewModel, navController: NavHostController, mo
 
         ApiStatus.FAILED -> {
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = stringResource(id = R.string.error))
                 Button(
-                    onClick = { viewModel.retrieveData() },
+                    onClick = { viewModel.retrieveData(email) },
                     modifier = Modifier.padding(top = 16.dp),
                     contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
                 ) {
@@ -252,7 +339,14 @@ fun ScreenContent(viewModel: MainViewModel, navController: NavHostController, mo
 }
 
 @Composable
-fun ListItem(movie: Movie, onClick: () -> Unit) {
+fun ListItem(
+    movie: Movie,
+    onClick: () -> Unit,
+    onEditClick: (Movie) -> Unit,
+    onDeleteClick: (Movie) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
     Card(
         onClick = onClick,
         modifier = Modifier.padding(8.dp),
@@ -277,36 +371,66 @@ fun ListItem(movie: Movie, onClick: () -> Unit) {
                     .aspectRatio(2f / 3f)
                     .clip(RoundedCornerShape(12.dp))
             )
+
+            IconButton(
+                onClick = { expanded = true },
+                modifier = Modifier.align(Alignment.TopEnd)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "Menu",
+                    tint = Color.White
+                )
+            }
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Edit") },
+                    onClick = {
+                        expanded = false
+                        onEditClick(movie)
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("Hapus") },
+                    onClick = {
+                        expanded = false
+                        onDeleteClick(movie)
+                    }
+                )
+            }
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(10.dp))
-                    .background(
-                        Color(
-                            red = 0f,
-                            green = 0f,
-                            blue = 0f,
-                            alpha = 0.5f
-                        )
-                    ).padding(8.dp)
+                    .background(Color(0f, 0f, 0f, 0.5f))
+                    .padding(8.dp)
             ) {
-                Text(
-                    text = movie.title,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Text(
-                    text = movie.genre,
-                    fontStyle = FontStyle.Italic,
-                    fontSize = 14.sp,
-                    color = Color.White
-                )
-                Text(
-                    text = "${movie.rating}/10",
-                    color = Color.White
-                )
+                Text(movie.title, fontWeight = FontWeight.Bold, color = Color.White)
+                Text(movie.genre, fontStyle = FontStyle.Italic, fontSize = 14.sp, color = Color.White)
+                Text("${movie.rating}/10", color = Color.White)
             }
         }
+    }
+}
+
+@Composable
+fun EmptyLoginState(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Silahkan login terlebih dahulu",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
 

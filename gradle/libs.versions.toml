@@ -18,6 +18,7 @@ googleid = "1.2.0"
 datastorePreferences = "1.2.0"
 benchmarkTraceprocessor = "1.4.1"
 androidImageCropper = "4.5.0"
+material3 = "1.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,6 +48,7 @@ converter-moshi = { group = "com.squareup.retrofit2", name = "converter-moshi", 
 moshi-kotlin = { group = "com.squareup.moshi", name = "moshi-kotlin", version.ref = "moshiKotlin" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose"}
 androidx-benchmark-traceprocessor = { group = "androidx.benchmark", name = "benchmark-traceprocessor", version.ref = "benchmarkTraceprocessor" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

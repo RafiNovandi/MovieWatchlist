@@ -27,6 +27,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -34,20 +36,24 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.muhammadrafinovandi0108.moviewatchlist.R
+import com.muhammadrafinovandi0108.moviewatchlist.model.Movie
 import com.muhammadrafinovandi0108.moviewatchlist.ui.theme.MovieWatchlistTheme
 
 @Composable
 fun FilmDialog(
     bitmap: Bitmap?,
+    movie: Movie? = null,
     onDismissRequest: () -> Unit,
     onConfirmation: (String, String, String, String, String) -> Unit
 ) {
-    var title by remember { mutableStateOf("") }
-    var genre by remember { mutableStateOf("") }
-    var rating by remember { mutableStateOf("") }
-    var watchedDate by remember { mutableStateOf("") }
-    var review by remember { mutableStateOf("") }
+    var title by remember { mutableStateOf(movie?.title ?: "") }
+    var genre by remember { mutableStateOf(movie?.genre ?: "") }
+    var rating by remember { mutableStateOf(movie?.rating?.toString() ?: "") }
+    var watchedDate by remember { mutableStateOf(movie?.watched_date ?: "") }
+    var review by remember { mutableStateOf(movie?.review ?: "") }
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
@@ -58,12 +64,29 @@ fun FilmDialog(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Image(
-                    bitmap = bitmap!!.asImageBitmap(),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxWidth().aspectRatio(2f/3f).clip(RoundedCornerShape(6.dp))
-                )
-
+                if (bitmap != null) {
+                    Image(
+                        bitmap = bitmap.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(2f / 3f)
+                            .clip(RoundedCornerShape(6.dp))
+                    )
+                } else if (movie != null) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(movie.image_url)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = movie.title,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(2f / 3f)
+                            .clip(RoundedCornerShape(6.dp))
+                    )
+                }
                 Column(
                     modifier = Modifier
                         .heightIn(max = 200.dp)
@@ -150,6 +173,8 @@ fun FilmDialog(
         }
     }
 }
+
+
 
 @Preview(showBackground = true)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)

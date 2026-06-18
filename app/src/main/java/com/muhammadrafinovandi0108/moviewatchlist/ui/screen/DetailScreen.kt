@@ -14,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -34,7 +35,11 @@ import com.muhammadrafinovandi0108.moviewatchlist.ui.theme.MovieWatchlistTheme
 fun DetailScreen(navController: NavController, movieId: Long) {
 
     val viewModel: MainViewModel = viewModel()
-    val movie = viewModel.data.value.find { it.id == movieId }
+    val movie = viewModel.selectedMovie.value
+
+    LaunchedEffect(movieId) {
+        viewModel.retrieveMovieById(movieId)
+    }
 
     Scaffold(
         topBar = {
