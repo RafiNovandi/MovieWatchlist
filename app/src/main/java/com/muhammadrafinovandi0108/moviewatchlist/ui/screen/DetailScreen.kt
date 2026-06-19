@@ -172,7 +172,7 @@ fun DetailScreen(navController: NavController, movieId: Long) {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
 fun DetailScreenPreview(){
-    MovieWatchlistTheme() {
+    MovieWatchlistTheme {
         DetailScreen(
             navController = rememberNavController(),
             movieId = 1L
