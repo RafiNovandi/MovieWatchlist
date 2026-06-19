@@ -16,4 +16,7 @@
     <string name="simpan">Simpan</string>
     <string name="judul">Judul</string>
     <string name="silahkan_login">Silakhan login terlebih dahulu.</string>
+    <string name="pesan_hapus">Hapus film ini?</string>
+    <string name="tombol_hapus">Hapus</string>
+    <string name="tombol_edit">Edit</string>
 </resources>

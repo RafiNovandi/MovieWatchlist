@@ -106,6 +106,7 @@ fun MainScreen(navController: NavHostController) {
 
     var selectedMovie by remember { mutableStateOf<Movie?>(null) }
     var showEditDialog by remember { mutableStateOf(false) }
+    var showAlertDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(user.email) {
         if (user.email.isNotEmpty()) {
@@ -203,7 +204,8 @@ fun MainScreen(navController: NavHostController) {
                 showEditDialog = true
             },
             onDeleteClick = { movie ->
-                viewModel.deleteMovie(user.email, movie.id)
+                selectedMovie = movie
+                showAlertDialog = true
             }
         )
 
@@ -241,6 +243,25 @@ fun MainScreen(navController: NavHostController) {
                 selectedMovie = null
             }
         }
+
+        if (showAlertDialog && selectedMovie != null) {
+            DisplayAlertDialog(
+                onDismissRequest = {
+                    showAlertDialog = false
+                    selectedMovie = null
+                },
+                onConfirmation = {
+                    viewModel.deleteMovie(
+                        user.email,
+                        selectedMovie!!.id
+                    )
+
+                    showAlertDialog = false
+                    selectedMovie = null
+                }
+            )
+        }
+
         if (errorMessage != null) {
             Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
             viewModel.clearMessage()
@@ -389,14 +410,14 @@ fun ListItem(
                 onDismissRequest = { expanded = false }
             ) {
                 DropdownMenuItem(
-                    text = { Text("Edit") },
+                    text = { Text(stringResource(R.string.tombol_edit)) },
                     onClick = {
                         expanded = false
                         onEditClick(movie)
                     }
                 )
                 DropdownMenuItem(
-                    text = { Text("Hapus") },
+                    text = { Text(stringResource(R.string.tombol_hapus)) },
                     onClick = {
                         expanded = false
                         onDeleteClick(movie)
